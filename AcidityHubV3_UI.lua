@@ -30,3 +30,5 @@ function Lib.Init(Config)
     end;
     local UITitle = Instance.new("TextLabel");
 end;
+
+return Lib;
