@@ -15,6 +15,11 @@ function Lib.Init(Config)
     local Title = Config.Title or "nil"
 
     local UIHolder = Instance.new("ScreenGui");
+    if syn.crypt then
+        UIHolder.Name = syn.crypt.random(24);
+    else
+        UIHolder.Name = "";
+    end;
     if syn.protect_gui then
         syn.protect_gui(UIHolder);
     end;
