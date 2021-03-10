@@ -12,7 +12,8 @@ local Themes = {
 }
 
 function Lib.InitStartup(Config)
-    local Title = Config.Title or "nil"
+    local Title = Config.Title or "nil";
+    local Theme = Themes[Config["Theme"]] or "DarkTheme";
 
     local UIHolder = Instance.new("ScreenGui");
     if syn.crypt then
@@ -30,6 +31,10 @@ function Lib.InitStartup(Config)
     else
         UIHolder.Parent = game:GetService("CoreGui");
     end;
+    local UIBackground = Instance.new("Frame");
+    UIBackground.Parent = UIHolder;
+
+
     local UITitle = Instance.new("TextLabel");
     return UIHolder;
 end;
