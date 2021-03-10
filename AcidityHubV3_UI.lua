@@ -16,7 +16,9 @@ function Lib.InitStartup(Config)
 
     local UIHolder = Instance.new("ScreenGui");
     if syn.crypt then
-        UIHolder.Name = syn.crypt.random(24);
+        math.randomseed(tick());
+        local rand = Random.new();
+        UIHolder.Name = rand:NextNumber(15, 35);
     else
         UIHolder.Name = "";
     end;
@@ -29,7 +31,6 @@ function Lib.InitStartup(Config)
         UIHolder.Parent = game:GetService("CoreGui");
     end;
     local UITitle = Instance.new("TextLabel");
-    return UIHolder;
 end;
 
 return Lib;
