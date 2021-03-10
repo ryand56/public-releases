@@ -11,7 +11,7 @@ local Themes = {
     }
 }
 
-function Lib.Init(Config)
+function Lib.InitStartup(Config)
     local Title = Config.Title or "nil"
 
     local UIHolder = Instance.new("ScreenGui");
