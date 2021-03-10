@@ -19,7 +19,7 @@ function Lib.InitStartup(Config)
     if syn.crypt then
         math.randomseed(tick());
         local rand = Random.new();
-        UIHolder.Name = rand:NextNumber(15, 35);
+        UIHolder.Name = syn.crypt.random(rand:NextNumber(15, 35));
     else
         UIHolder.Name = "";
     end;
