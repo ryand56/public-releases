@@ -29,6 +29,7 @@ function Lib.InitStartup(Config)
         UIHolder.Parent = game:GetService("CoreGui");
     end;
     local UITitle = Instance.new("TextLabel");
+    return UIHolder;
 end;
 
 return Lib;
