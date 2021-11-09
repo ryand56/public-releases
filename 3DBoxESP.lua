@@ -345,6 +345,16 @@ local function createESPBox(Character)
 						end;
 					end;
 				end);
+				
+				local Humanoid = Character:FindFirstChildOfClass("Humanoid");
+				if Humanoid ~= nil then
+					Humanoid.Died:Connect(function()
+						if ESPStorage.Players[Player.UserId].Cube ~= nil then
+							ESPStorage.Players[Player.UserId].Cube:Remove();
+							ESPStorage.Players[Player.UserId].Cube = nil;
+						end;
+					end);
+				end;
 			end;
 		end;
 	end;
