@@ -299,6 +299,12 @@ function Library:New3DCircle()
     return _circle;
 end;
 
+------------------------------------------------------
+
+local ESP = {
+	Enabled = false
+};
+
 local Players = game:GetService("Players");
 local LocalPlayer = Players.LocalPlayer;
 local RunService = game:GetService("RunService");
@@ -360,174 +366,203 @@ local function createESPBox(Character)
 	end;
 end;
 
-for _, Player in next, Players:GetPlayers() do
-	if Player ~= LocalPlayer and Player.Character ~= nil then
-		if ESPStorage.Players[Player.UserId] == nil then
-			ESPStorage.Players[Player.UserId] = {
-				["Character"] = Player.Character
-			};
-		end;
-		
-		if ESPStorage.CharAddedEventStorage[Player.UserId] == nil then
-			ESPStorage.CharAddedEventStorage[Player.UserId] = Player.CharacterAdded:Connect(function(Character)
-				ESPStorage.Players[Player.UserId].Character = Character;
-				
-				repeat task.wait() until Character:FindFirstChild("HumanoidRootPart");
-				repeat task.wait() until Character:FindFirstChild("Head");
-				
-				createESPBox(Character);
-			end);
-			
-			createESPBox(Player.Character);
-		end;
-	end;
-end;
-
 Players.PlayerAdded:Connect(function(Player)
-	if Player ~= LocalPlayer then
-		if ESPStorage.Players[Player.UserId] == nil then
-			ESPStorage.Players[Player.UserId] = {};
-		end;
-		
-		if ESPStorage.CharAddedEventStorage[Player.UserId] == nil then
-			ESPStorage.CharAddedEventStorage[Player.UserId] = Player.CharacterAdded:Connect(function(Character)
-				ESPStorage.Players[Player.UserId].Character = Character;
-				
-				repeat task.wait() until Character:FindFirstChild("HumanoidRootPart");
-				repeat task.wait() until Character:FindFirstChild("Head");
-				
-				createESPBox(Character);
-			end);
+	if ESP.Enabled then
+		if Player ~= LocalPlayer then
+			if ESPStorage.Players[Player.UserId] == nil then
+				ESPStorage.Players[Player.UserId] = {};
+			end;
 			
-			createESPBox(Player.Character);
+			if ESPStorage.CharAddedEventStorage[Player.UserId] == nil then
+				ESPStorage.CharAddedEventStorage[Player.UserId] = Player.CharacterAdded:Connect(function(Character)
+					ESPStorage.Players[Player.UserId].Character = Character;
+					
+					repeat task.wait() until Character:FindFirstChild("HumanoidRootPart");
+					repeat task.wait() until Character:FindFirstChild("Head");
+					
+					createESPBox(Character);
+				end);
+				
+				createESPBox(Player.Character);
+			end;
 		end;
 	end;
 end);
 
 Players.PlayerRemoving:Connect(function(Player)
-	if typeof(ESPStorage.CharAddedEventStorage[Player.UserId]) == "RBXScriptConnection" then
-		ESPStorage.CharAddedEventStorage[Player.UserId]:Disconnect();
-		ESPStorage.CharAddedEventStorage[Player.UserId] = nil;
+	if ESP.Enabled then
+		if typeof(ESPStorage.CharAddedEventStorage[Player.UserId]) == "RBXScriptConnection" then
+			ESPStorage.CharAddedEventStorage[Player.UserId]:Disconnect();
+			ESPStorage.CharAddedEventStorage[Player.UserId] = nil;
+		end;
+		if ESPStorage.Players[Player.UserId].Cube ~= nil then
+			pcall(function()
+				ESPStorage.Players[Player.UserId].Cube:Remove();
+				ESPStorage.Players[Player.UserId].Cube = nil;
+			end);
+		end;
+		ESPStorage.Players[Player.UserId] = nil;
 	end;
-	if ESPStorage.Players[Player.UserId].Cube ~= nil then
-		pcall(function()
-			ESPStorage.Players[Player.UserId].Cube:Remove();
-			ESPStorage.Players[Player.UserId].Cube = nil;
-		end);
-	end;
-	ESPStorage.Players[Player.UserId] = nil;
 end);
 
 RunService:BindToRenderStep("UpdateESP", Enum.RenderPriority.Character.Value, function()
-	for _, ESP in next, ESPStorage.Players do
-		if ESP.Cube ~= nil then
-			local Character = ESP.Character;
-			
-			if Character ~= nil then
-				local Player = Players:GetPlayerFromCharacter(Character);
+	if ESP.Enabled then
+		for _, ESP in next, ESPStorage.Players do
+			if ESP.Cube ~= nil then
+				local Character = ESP.Character;
 				
-				local HRP = Character:FindFirstChild("HumanoidRootPart");
-				local Head = Character:FindFirstChild("Head");
-				
-				if Player ~= nil and HRP ~= nil and Head ~= nil then
-					local _cube = {
-						Visible      = false;
-						ZIndex       = 1;
-						Transparency = 1;
-						Color        = nColor(255, 255, 255);
-						Thickness    = 1;
-						Filled       = true;
-						
-						Position     = nVector3(0,0,0);
-						Size         = nVector3(0,0,0);
-						Rotation     = nVector3(0,0,0);
-					};
-					local _defaults  = _cube;
+				if Character ~= nil then
+					local Player = Players:GetPlayerFromCharacter(Character);
 					
-					if not ESP.Cube.Visible then
-						for f = 1, 6 do
-							ESP.Cube["face"..tostring(f)].Visible = false;
-						end;
-					else
-						for f = 1, 6 do
-							f = "face"..tostring(f)
-							ESP.Cube[f].Visible      = ESP.Cube.Visible      or _defaults.Visible;
-							ESP.Cube[f].ZIndex       = ESP.Cube.ZIndex       or _defaults.ZIndex;
-							ESP.Cube[f].Transparency = ESP.Cube.Transparency or _defaults.Transparency;
-							ESP.Cube[f].Color        = ESP.Cube.Color        or _defaults.Color;
-							ESP.Cube[f].Thickness    = ESP.Cube.Thickness    or _defaults.Thickness;
-							ESP.Cube[f].Filled       = ESP.Cube.Filled       or _defaults.Filled;
-						end;
-
-						local rot = ESP.Cube.Rotation or _defaults.Rotation;
-						local pos = HRP.Position or _defaults.Position;
-						local _rotCFrame = nCFrame(pos) * nCFAngles(rad(rot.X), rad(rot.Y), rad(rot.Z));
-
-						local _size = ESP.Cube.Size or _defaults.Size;
-						local _points = {
-							[1] = (_rotCFrame * nCFrame(_size.X, _size.Y, _size.Z)).p;
-							[2] = (_rotCFrame * nCFrame(_size.X, _size.Y, -_size.Z)).p;
-							[3] = (_rotCFrame * nCFrame(_size.X, -_size.Y, _size.Z)).p;
-							[4] = (_rotCFrame * nCFrame(_size.X, -_size.Y, -_size.Z)).p;
-							[5] = (_rotCFrame * nCFrame(-_size.X, _size.Y, _size.Z)).p;
-							[6] = (_rotCFrame * nCFrame(-_size.X, _size.Y, -_size.Z)).p;
-							[7] = (_rotCFrame * nCFrame(-_size.X, -_size.Y, _size.Z)).p;
-							[8] = (_rotCFrame * nCFrame(-_size.X, -_size.Y, -_size.Z)).p;
+					local HRP = Character:FindFirstChild("HumanoidRootPart");
+					local Head = Character:FindFirstChild("Head");
+					
+					if Player ~= nil and HRP ~= nil and Head ~= nil then
+						local _cube = {
+							Visible      = false;
+							ZIndex       = 1;
+							Transparency = 1;
+							Color        = nColor(255, 255, 255);
+							Thickness    = 1;
+							Filled       = true;
+							
+							Position     = nVector3(0,0,0);
+							Size         = nVector3(0,0,0);
+							Rotation     = nVector3(0,0,0);
 						};
-
-						local _vis = true;
-
-						for p = 1, #_points do
-							local _p, v = ToScreen(Camera, _points[p]);
-							local _stored = _points[p];
-							_points[p] = nVector2(_p.x, _p.y);
-
-							if not v and not checkCamView(_stored) then 
-								_vis = false;
-								break;
-							end;
-						end;
-
-						if _vis then
-							ESP.Cube.face1.PointA = _points[1]; -- Side
-							ESP.Cube.face1.PointB = _points[2];
-							ESP.Cube.face1.PointC = _points[4];
-							ESP.Cube.face1.PointD = _points[3];
-
-							ESP.Cube.face2.PointA = _points[5]; -- Side
-							ESP.Cube.face2.PointB = _points[6];
-							ESP.Cube.face2.PointC = _points[8];
-							ESP.Cube.face2.PointD = _points[7];
-
-							ESP.Cube.face3.PointA = _points[1]; -- Side
-							ESP.Cube.face3.PointB = _points[5];
-							ESP.Cube.face3.PointC = _points[7];
-							ESP.Cube.face3.PointD = _points[3];
-
-							ESP.Cube.face4.PointA = _points[2]; -- Side
-							ESP.Cube.face4.PointB = _points[4];
-							ESP.Cube.face4.PointC = _points[8];
-							ESP.Cube.face4.PointD = _points[6];
-
-							ESP.Cube.face5.PointA = _points[1]; -- Top
-							ESP.Cube.face5.PointB = _points[2];
-							ESP.Cube.face5.PointC = _points[6];
-							ESP.Cube.face5.PointD = _points[5];
-
-							ESP.Cube.face6.PointA = _points[3]; -- Bottom
-							ESP.Cube.face6.PointB = _points[4];
-							ESP.Cube.face6.PointC = _points[8];
-							ESP.Cube.face6.PointD = _points[7];
-						else
+						local _defaults  = _cube;
+						
+						if not ESP.Cube.Visible then
 							for f = 1, 6 do
 								ESP.Cube["face"..tostring(f)].Visible = false;
 							end;
+						else
+							for f = 1, 6 do
+								f = "face"..tostring(f)
+								ESP.Cube[f].Visible      = ESP.Cube.Visible      or _defaults.Visible;
+								ESP.Cube[f].ZIndex       = ESP.Cube.ZIndex       or _defaults.ZIndex;
+								ESP.Cube[f].Transparency = ESP.Cube.Transparency or _defaults.Transparency;
+								ESP.Cube[f].Color        = ESP.Cube.Color        or _defaults.Color;
+								ESP.Cube[f].Thickness    = ESP.Cube.Thickness    or _defaults.Thickness;
+								ESP.Cube[f].Filled       = ESP.Cube.Filled       or _defaults.Filled;
+							end;
+
+							local rot = ESP.Cube.Rotation or _defaults.Rotation;
+							local pos = HRP.Position or _defaults.Position;
+							local _rotCFrame = nCFrame(pos) * nCFAngles(rad(rot.X), rad(rot.Y), rad(rot.Z));
+
+							local _size = ESP.Cube.Size or _defaults.Size;
+							local _points = {
+								[1] = (_rotCFrame * nCFrame(_size.X, _size.Y, _size.Z)).p;
+								[2] = (_rotCFrame * nCFrame(_size.X, _size.Y, -_size.Z)).p;
+								[3] = (_rotCFrame * nCFrame(_size.X, -_size.Y, _size.Z)).p;
+								[4] = (_rotCFrame * nCFrame(_size.X, -_size.Y, -_size.Z)).p;
+								[5] = (_rotCFrame * nCFrame(-_size.X, _size.Y, _size.Z)).p;
+								[6] = (_rotCFrame * nCFrame(-_size.X, _size.Y, -_size.Z)).p;
+								[7] = (_rotCFrame * nCFrame(-_size.X, -_size.Y, _size.Z)).p;
+								[8] = (_rotCFrame * nCFrame(-_size.X, -_size.Y, -_size.Z)).p;
+							};
+
+							local _vis = true;
+
+							for p = 1, #_points do
+								local _p, v = ToScreen(Camera, _points[p]);
+								local _stored = _points[p];
+								_points[p] = nVector2(_p.x, _p.y);
+
+								if not v and not checkCamView(_stored) then 
+									_vis = false;
+									break;
+								end;
+							end;
+
+							if _vis then
+								ESP.Cube.face1.PointA = _points[1]; -- Side
+								ESP.Cube.face1.PointB = _points[2];
+								ESP.Cube.face1.PointC = _points[4];
+								ESP.Cube.face1.PointD = _points[3];
+
+								ESP.Cube.face2.PointA = _points[5]; -- Side
+								ESP.Cube.face2.PointB = _points[6];
+								ESP.Cube.face2.PointC = _points[8];
+								ESP.Cube.face2.PointD = _points[7];
+
+								ESP.Cube.face3.PointA = _points[1]; -- Side
+								ESP.Cube.face3.PointB = _points[5];
+								ESP.Cube.face3.PointC = _points[7];
+								ESP.Cube.face3.PointD = _points[3];
+
+								ESP.Cube.face4.PointA = _points[2]; -- Side
+								ESP.Cube.face4.PointB = _points[4];
+								ESP.Cube.face4.PointC = _points[8];
+								ESP.Cube.face4.PointD = _points[6];
+
+								ESP.Cube.face5.PointA = _points[1]; -- Top
+								ESP.Cube.face5.PointB = _points[2];
+								ESP.Cube.face5.PointC = _points[6];
+								ESP.Cube.face5.PointD = _points[5];
+
+								ESP.Cube.face6.PointA = _points[3]; -- Bottom
+								ESP.Cube.face6.PointB = _points[4];
+								ESP.Cube.face6.PointC = _points[8];
+								ESP.Cube.face6.PointD = _points[7];
+							else
+								for f = 1, 6 do
+									ESP.Cube["face"..tostring(f)].Visible = false;
+								end;
+							end;
 						end;
+						
+						ESP.Cube.Color = Player.TeamColor.Color;
 					end;
-					
-					ESP.Cube.Color = Player.TeamColor.Color;
 				end;
 			end;
 		end;
 	end;
 end);
+
+function ESP:Toggle()
+	ESP.Enabled = not ESP.Enabled;
+	if ESP.Enabled then
+		for _, Player in next, Players:GetPlayers() do
+			if Player ~= LocalPlayer and Player.Character ~= nil then
+				if ESPStorage.Players[Player.UserId] == nil then
+					ESPStorage.Players[Player.UserId] = {
+						["Character"] = Player.Character
+					};
+				end;
+				
+				if ESPStorage.CharAddedEventStorage[Player.UserId] == nil then
+					ESPStorage.CharAddedEventStorage[Player.UserId] = Player.CharacterAdded:Connect(function(Character)
+						ESPStorage.Players[Player.UserId].Character = Character;
+						
+						repeat task.wait() until Character:FindFirstChild("HumanoidRootPart");
+						repeat task.wait() until Character:FindFirstChild("Head");
+						
+						createESPBox(Character);
+					end);
+					
+					createESPBox(Player.Character);
+				end;
+			end;
+		end;
+	else
+		for _, Player in next, Players:GetPlayers() do
+			if ESPStorage.Players[Player.UserId] ~= nil then
+				if ESPStorage.Players[Player.UserId].Cube ~= nil then
+					ESPStorage.Players[Player.UserId].Cube:Remove();
+					ESPStorage.Players[Player.UserId].Cube = nil;
+				end;
+				
+				ESPStorage.Players[Player.UserId] = nil;
+			end;
+			
+			if typeof(ESPStorage.CharAddedEventStorage[Player.UserId]) == "RBXScriptConnection" then
+				ESPStorage.CharAddedEventStorage[Player.UserId]:Disconnect();
+				ESPStorage.CharAddedEventStorage[Player.UserId] = nil;
+			end;
+		end;
+	end;
+end;
+
+return ESP;
