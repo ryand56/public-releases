@@ -328,7 +328,7 @@ local function createESPBox(Character)
 				Cube.Visible = true;
 				Cube.ZIndex = 1;
 				Cube.Transparency = 0.3;
-				Cube.Color = Player.TeamColor.Color;
+				Cube.Color = ESP.TeamColor and Player.TeamColor.Color or ESP.DefaultColor;
 				Cube.Thickness = 3;
 				Cube.Filled = true;
 				
@@ -424,7 +424,7 @@ RunService:BindToRenderStep("UpdateESP", Enum.RenderPriority.Character.Value, fu
 							Visible      = false;
 							ZIndex       = 1;
 							Transparency = 1;
-							Color        = nColor(255, 255, 255);
+							Color        = ESP.DefaultColor;
 							Thickness    = 1;
 							Filled       = true;
 							
