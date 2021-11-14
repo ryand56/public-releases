@@ -302,7 +302,9 @@ end;
 ------------------------------------------------------
 
 local ESP = {
-	Enabled = false
+	Enabled = false,
+	TeamColor = true,
+	DefaultColor = Color3.fromRGB(255, 255, 255)
 };
 
 local Players = game:GetService("Players");
@@ -513,7 +515,7 @@ RunService:BindToRenderStep("UpdateESP", Enum.RenderPriority.Character.Value, fu
 							end;
 						end;
 						
-						ESP.Cube.Color = Player.TeamColor.Color;
+						ESP.Cube.Color = ESP.TeamColor and Player.TeamColor.Color or ESP.DefaultColor;
 					end;
 				end;
 			end;
@@ -562,6 +564,16 @@ function ESP:Toggle()
 				ESPStorage.CharAddedEventStorage[Player.UserId] = nil;
 			end;
 		end;
+	end;
+end;
+
+function ESP:ToggleTeam()
+	ESP.TeamColor = not ESP.TeamColor;
+end;
+
+function ESP:SetDefaultColor(Color)
+	if typeof(Color) == "Color3" then
+		ESP.DefaultColor = Color;
 	end;
 end;
 
