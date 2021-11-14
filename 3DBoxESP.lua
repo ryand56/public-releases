@@ -409,9 +409,9 @@ end);
 
 RunService:BindToRenderStep("UpdateESP", Enum.RenderPriority.Character.Value, function()
 	if ESP.Enabled then
-		for _, ESP in next, ESPStorage.Players do
-			if ESP.Cube ~= nil then
-				local Character = ESP.Character;
+		for _, PlayerESP in next, ESPStorage.Players do
+			if PlayerESP.Cube ~= nil then
+				local Character = PlayerESP.Character;
 				
 				if Character ~= nil then
 					local Player = Players:GetPlayerFromCharacter(Character);
@@ -434,26 +434,26 @@ RunService:BindToRenderStep("UpdateESP", Enum.RenderPriority.Character.Value, fu
 						};
 						local _defaults  = _cube;
 						
-						if not ESP.Cube.Visible then
+						if not PlayerESP.Cube.Visible then
 							for f = 1, 6 do
-								ESP.Cube["face"..tostring(f)].Visible = false;
+								PlayerESP.Cube["face"..tostring(f)].Visible = false;
 							end;
 						else
 							for f = 1, 6 do
 								f = "face"..tostring(f)
-								ESP.Cube[f].Visible      = ESP.Cube.Visible      or _defaults.Visible;
-								ESP.Cube[f].ZIndex       = ESP.Cube.ZIndex       or _defaults.ZIndex;
-								ESP.Cube[f].Transparency = ESP.Cube.Transparency or _defaults.Transparency;
-								ESP.Cube[f].Color        = ESP.Cube.Color        or _defaults.Color;
-								ESP.Cube[f].Thickness    = ESP.Cube.Thickness    or _defaults.Thickness;
-								ESP.Cube[f].Filled       = ESP.Cube.Filled       or _defaults.Filled;
+								PlayerESP.Cube[f].Visible      = PlayerESP.Cube.Visible      or _defaults.Visible;
+								PlayerESP.Cube[f].ZIndex       = PlayerESP.Cube.ZIndex       or _defaults.ZIndex;
+								PlayerESP.Cube[f].Transparency = PlayerESP.Cube.Transparency or _defaults.Transparency;
+								PlayerESP.Cube[f].Color        = PlayerESP.Cube.Color        or _defaults.Color;
+								PlayerESP.Cube[f].Thickness    = PlayerESP.Cube.Thickness    or _defaults.Thickness;
+								PlayerESP.Cube[f].Filled       = PlayerESP.Cube.Filled       or _defaults.Filled;
 							end;
 
-							local rot = ESP.Cube.Rotation or _defaults.Rotation;
+							local rot = PlayerESP.Cube.Rotation or _defaults.Rotation;
 							local pos = HRP.Position or _defaults.Position;
 							local _rotCFrame = nCFrame(pos) * nCFAngles(rad(rot.X), rad(rot.Y), rad(rot.Z));
 
-							local _size = ESP.Cube.Size or _defaults.Size;
+							local _size = PlayerESP.Cube.Size or _defaults.Size;
 							local _points = {
 								[1] = (_rotCFrame * nCFrame(_size.X, _size.Y, _size.Z)).p;
 								[2] = (_rotCFrame * nCFrame(_size.X, _size.Y, -_size.Z)).p;
@@ -479,43 +479,43 @@ RunService:BindToRenderStep("UpdateESP", Enum.RenderPriority.Character.Value, fu
 							end;
 
 							if _vis then
-								ESP.Cube.face1.PointA = _points[1]; -- Side
-								ESP.Cube.face1.PointB = _points[2];
-								ESP.Cube.face1.PointC = _points[4];
-								ESP.Cube.face1.PointD = _points[3];
+								PlayerESP.Cube.face1.PointA = _points[1]; -- Side
+								PlayerESP.Cube.face1.PointB = _points[2];
+								PlayerESP.Cube.face1.PointC = _points[4];
+								PlayerESP.Cube.face1.PointD = _points[3];
 
-								ESP.Cube.face2.PointA = _points[5]; -- Side
-								ESP.Cube.face2.PointB = _points[6];
-								ESP.Cube.face2.PointC = _points[8];
-								ESP.Cube.face2.PointD = _points[7];
+								PlayerESP.Cube.face2.PointA = _points[5]; -- Side
+								PlayerESP.Cube.face2.PointB = _points[6];
+								PlayerESP.Cube.face2.PointC = _points[8];
+								PlayerESP.Cube.face2.PointD = _points[7];
 
-								ESP.Cube.face3.PointA = _points[1]; -- Side
-								ESP.Cube.face3.PointB = _points[5];
-								ESP.Cube.face3.PointC = _points[7];
-								ESP.Cube.face3.PointD = _points[3];
+								PlayerESP.Cube.face3.PointA = _points[1]; -- Side
+								PlayerESP.Cube.face3.PointB = _points[5];
+								PlayerESP.Cube.face3.PointC = _points[7];
+								PlayerESP.Cube.face3.PointD = _points[3];
 
-								ESP.Cube.face4.PointA = _points[2]; -- Side
-								ESP.Cube.face4.PointB = _points[4];
-								ESP.Cube.face4.PointC = _points[8];
-								ESP.Cube.face4.PointD = _points[6];
+								PlayerESP.Cube.face4.PointA = _points[2]; -- Side
+								PlayerESP.Cube.face4.PointB = _points[4];
+								PlayerESP.Cube.face4.PointC = _points[8];
+								PlayerESP.Cube.face4.PointD = _points[6];
 
-								ESP.Cube.face5.PointA = _points[1]; -- Top
-								ESP.Cube.face5.PointB = _points[2];
-								ESP.Cube.face5.PointC = _points[6];
-								ESP.Cube.face5.PointD = _points[5];
+								PlayerESP.Cube.face5.PointA = _points[1]; -- Top
+								PlayerESP.Cube.face5.PointB = _points[2];
+								PlayerESP.Cube.face5.PointC = _points[6];
+								PlayerESP.Cube.face5.PointD = _points[5];
 
-								ESP.Cube.face6.PointA = _points[3]; -- Bottom
-								ESP.Cube.face6.PointB = _points[4];
-								ESP.Cube.face6.PointC = _points[8];
-								ESP.Cube.face6.PointD = _points[7];
+								PlayerESP.Cube.face6.PointA = _points[3]; -- Bottom
+								PlayerESP.Cube.face6.PointB = _points[4];
+								PlayerESP.Cube.face6.PointC = _points[8];
+								PlayerESP.Cube.face6.PointD = _points[7];
 							else
 								for f = 1, 6 do
-									ESP.Cube["face"..tostring(f)].Visible = false;
+									PlayerESP.Cube["face"..tostring(f)].Visible = false;
 								end;
 							end;
 						end;
 						
-						ESP.Cube.Color = ESP.TeamColor and Player.TeamColor.Color or ESP.DefaultColor;
+						PlayerESP.Cube.Color = ESP.TeamColor and Player.TeamColor.Color or ESP.DefaultColor;
 					end;
 				end;
 			end;
