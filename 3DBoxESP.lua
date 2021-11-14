@@ -449,7 +449,7 @@ RunService:BindToRenderStep("UpdateESP", Enum.RenderPriority.Character.Value, fu
 								PlayerESP.Cube[f].Filled       = PlayerESP.Cube.Filled       or _defaults.Filled;
 							end;
 
-							local rot = PlayerESP.Cube.Rotation or _defaults.Rotation;
+							local rot = HRP.Rotation or _defaults.Rotation;
 							local pos = HRP.Position or _defaults.Position;
 							local _rotCFrame = nCFrame(pos) * nCFAngles(rad(rot.X), rad(rot.Y), rad(rot.Z));
 
