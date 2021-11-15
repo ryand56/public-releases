@@ -599,9 +599,8 @@ RunService:BindToRenderStep("UpdateESP", Enum.RenderPriority.Character.Value, fu
 	end;
 end);
 
-function ESP:Toggle()
-	ESP.Enabled = not ESP.Enabled;
-	if ESP.Enabled then
+local function ToggleCallback(Value)
+	if Value then
 		for _, Player in next, Players:GetPlayers() do
 			if Player ~= LocalPlayer and Player.Character ~= nil then
 				if ESPStorage.Players[Player.UserId] == nil then
@@ -761,6 +760,18 @@ function ESP:Toggle()
 			end;
 		end;
 	end;
+end;
+
+function ESP:SetEnabled(Value)
+	if type(Value) == "boolean" then
+		ESP.Enabled = Value;
+		ToggleCallback(ESP.Enabled);
+	end;
+end;
+
+function ESP:Toggle()
+	ESP.Enabled = not ESP.Enabled;
+	ToggleCallback(ESP.Enabled);
 end;
 
 function ESP:ToggleTeam()
