@@ -303,6 +303,8 @@ end;
 
 local ESP = {
 	Enabled = false,
+	Boxes = true,
+	Names = true,
 	TeamColor = true,
 	DefaultColor = Color3.fromRGB(255, 255, 255)
 };
@@ -335,34 +337,31 @@ local function createESPBox(Character)
 				Cube.Size = HRP.Size;
 				
 				ESPStorage.Players[Player.UserId].Cube = Cube;
-				
-				Character.AncestryChanged:Connect(function(_, parent)
-					if parent == nil then
-						if ESPStorage.Players[Player.UserId].Cube ~= nil then
-							ESPStorage.Players[Player.UserId].Cube:Remove();
-							ESPStorage.Players[Player.UserId].Cube = nil;
-						end;
-					end;
-				end);
-				
-				Character:GetPropertyChangedSignal("Parent"):Connect(function()
-					if Character.Parent == nil then
-						if ESPStorage.Players[Player.UserId].Cube ~= nil then
-							ESPStorage.Players[Player.UserId].Cube:Remove();
-							ESPStorage.Players[Player.UserId].Cube = nil;
-						end;
-					end;
-				end);
-				
-				local Humanoid = Character:FindFirstChildOfClass("Humanoid");
-				if Humanoid ~= nil then
-					Humanoid.Died:Connect(function()
-						if ESPStorage.Players[Player.UserId].Cube ~= nil then
-							ESPStorage.Players[Player.UserId].Cube:Remove();
-							ESPStorage.Players[Player.UserId].Cube = nil;
-						end;
-					end);
+			end;
+		end;
+	end;
+end;
+
+local function createESPName(Character)
+	if Character and typeof(Character) == "Instance" and Character.ClassName == "Model" then
+		local Head = Character:FindFirstChild("Head");
+		if Head ~= nil then
+			local Player = Players:GetPlayerFromCharacter(Character);
+			
+			if Player ~= nil then
+				local Name = Drawing.new("Text");
+				if Player.DisplayName == Player.Name then
+					Name.Text = Player.Name;
+				else
+					Name.Text = string.format("%s (%s)", Player.DisplayName, Player.Name);
 				end;
+				Name.Size = 19;
+				Name.Center = true;
+				Name.Outline = true;
+				Name.Position = Vector2.new(0, 0);
+				Name.Color = ESP.TeamColor and Player.TeamColor.Color or ESP.DefaultColor;
+				
+				ESPStorage.Players[Player.UserId].Name = Name;
 			end;
 		end;
 	end;
@@ -382,10 +381,63 @@ Players.PlayerAdded:Connect(function(Player)
 					repeat task.wait() until Character:FindFirstChild("HumanoidRootPart");
 					repeat task.wait() until Character:FindFirstChild("Head");
 					
-					createESPBox(Character);
+					if ESP.Boxes then
+						createESPBox(Character);
+					end;
+					
+					if ESP.Names then
+						createESPName(Character);
+					end;
+					
+					Character.AncestryChanged:Connect(function(_, parent)
+						if parent == nil then
+							pcall(function()
+								if ESPStorage.Players[Player.UserId].Cube ~= nil then
+									ESPStorage.Players[Player.UserId].Cube:Remove();
+									ESPStorage.Players[Player.UserId].Cube = nil;
+								end;
+								
+								if ESPStorage.Players[Player.UserId].Name ~= nil then
+									ESPStorage.Players[Player.UserId].Name:Remove();
+									ESPStorage.Players[Player.UserId].Name = nil;
+								end;
+							end);
+						end;
+					end);
+					
+					Character:GetPropertyChangedSignal("Parent"):Connect(function()
+						if Character.Parent == nil then
+							pcall(function()
+								if ESPStorage.Players[Player.UserId].Cube ~= nil then
+									ESPStorage.Players[Player.UserId].Cube:Remove();
+									ESPStorage.Players[Player.UserId].Cube = nil;
+								end;
+								
+								if ESPStorage.Players[Player.UserId].Name ~= nil then
+									ESPStorage.Players[Player.UserId].Name:Remove();
+									ESPStorage.Players[Player.UserId].Name = nil;
+								end;
+							end);
+						end;
+					end);
+					
+					local Humanoid = Character:FindFirstChildOfClass("Humanoid");
+					if Humanoid ~= nil then
+						Humanoid.Died:Connect(function()
+							pcall(function()
+								if ESPStorage.Players[Player.UserId].Cube ~= nil then
+									ESPStorage.Players[Player.UserId].Cube:Remove();
+									ESPStorage.Players[Player.UserId].Cube = nil;
+								end;
+								
+								if ESPStorage.Players[Player.UserId].Name ~= nil then
+									ESPStorage.Players[Player.UserId].Name:Remove();
+									ESPStorage.Players[Player.UserId].Name = nil;
+								end;
+							end);
+						end);
+					end;
 				end);
-				
-				createESPBox(Player.Character);
 			end;
 		end;
 	end;
@@ -397,13 +449,19 @@ Players.PlayerRemoving:Connect(function(Player)
 			ESPStorage.CharAddedEventStorage[Player.UserId]:Disconnect();
 			ESPStorage.CharAddedEventStorage[Player.UserId] = nil;
 		end;
-		if ESPStorage.Players[Player.UserId].Cube ~= nil then
-			pcall(function()
+		pcall(function()
+			if ESPStorage.Players[Player.UserId].Cube ~= nil then
 				ESPStorage.Players[Player.UserId].Cube:Remove();
 				ESPStorage.Players[Player.UserId].Cube = nil;
-			end);
-		end;
-		ESPStorage.Players[Player.UserId] = nil;
+			end;
+			
+			if ESPStorage.Players[Player.UserId].Name ~= nil then
+				ESPStorage.Players[Player.UserId].Name:Remove();
+				ESPStorage.Players[Player.UserId].Name = nil;
+			end;
+			
+			ESPStorage.Players[Player.UserId] = nil;
+		end);
 	end;
 end);
 
@@ -519,6 +577,24 @@ RunService:BindToRenderStep("UpdateESP", Enum.RenderPriority.Character.Value, fu
 					end;
 				end;
 			end;
+		
+			if PlayerESP.Name ~= nil then
+				local Character = PlayerESP.Character;
+				
+				if Character ~= nil then
+					local Player = Players:GetPlayerFromCharacter(Character);
+					
+					local Head = Character:FindFirstChild("Head");
+					
+					if Player ~= nil and Head ~= nil then
+						local HeadPos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(Head.Position);
+						
+						PlayerESP.Name.Position = Vector2.new(HeadPos.X, HeadPos.Y);
+						PlayerESP.Name.Color = ESP.TeamColor and Player.TeamColor.Color or ESP.DefaultColor;
+						PlayerESP.Name.Visible = onScreen;
+					end;
+				end;
+			end;
 		end;
 	end;
 end);
@@ -541,20 +617,140 @@ function ESP:Toggle()
 						repeat task.wait() until Character:FindFirstChild("HumanoidRootPart");
 						repeat task.wait() until Character:FindFirstChild("Head");
 						
-						createESPBox(Character);
+						if ESP.Boxes then
+							createESPBox(Character);
+						end;
+						
+						if ESP.Names then
+							createESPName(Character);
+						end;
+						
+						Character.AncestryChanged:Connect(function(_, parent)
+							if parent == nil then
+								pcall(function()
+									if ESPStorage.Players[Player.UserId].Cube ~= nil then
+										ESPStorage.Players[Player.UserId].Cube:Remove();
+										ESPStorage.Players[Player.UserId].Cube = nil;
+									end;
+									
+									if ESPStorage.Players[Player.UserId].Name ~= nil then
+										ESPStorage.Players[Player.UserId].Name:Remove();
+										ESPStorage.Players[Player.UserId].Name = nil;
+									end;
+								end);
+							end;
+						end);
+						
+						Character:GetPropertyChangedSignal("Parent"):Connect(function()
+							if Character.Parent == nil then
+								pcall(function()
+									if ESPStorage.Players[Player.UserId].Cube ~= nil then
+										ESPStorage.Players[Player.UserId].Cube:Remove();
+										ESPStorage.Players[Player.UserId].Cube = nil;
+									end;
+									
+									if ESPStorage.Players[Player.UserId].Name ~= nil then
+										ESPStorage.Players[Player.UserId].Name:Remove();
+										ESPStorage.Players[Player.UserId].Name = nil;
+									end;
+								end);
+							end;
+						end);
+						
+						local Humanoid = Character:FindFirstChildOfClass("Humanoid");
+						if Humanoid ~= nil then
+							Humanoid.Died:Connect(function()
+								pcall(function()
+									if ESPStorage.Players[Player.UserId].Cube ~= nil then
+										ESPStorage.Players[Player.UserId].Cube:Remove();
+										ESPStorage.Players[Player.UserId].Cube = nil;
+									end;
+									
+									if ESPStorage.Players[Player.UserId].Name ~= nil then
+										ESPStorage.Players[Player.UserId].Name:Remove();
+										ESPStorage.Players[Player.UserId].Name = nil;
+									end;
+								end);
+							end);
+						end;
 					end);
-					
+				end;
+				
+				repeat task.wait() until Player.Character:FindFirstChild("HumanoidRootPart");
+				repeat task.wait() until Player.Character:FindFirstChild("Head");
+				
+				if ESP.Boxes then
 					createESPBox(Player.Character);
+				end;
+				
+				if ESP.Names then
+					createESPName(Player.Character);
+				end;
+				
+				Player.Character.AncestryChanged:Connect(function(_, parent)
+					if parent == nil then
+						pcall(function()
+							if ESPStorage.Players[Player.UserId].Cube ~= nil then
+								ESPStorage.Players[Player.UserId].Cube:Remove();
+								ESPStorage.Players[Player.UserId].Cube = nil;
+							end;
+							
+							if ESPStorage.Players[Player.UserId].Name ~= nil then
+								ESPStorage.Players[Player.UserId].Name:Remove();
+								ESPStorage.Players[Player.UserId].Name = nil;
+							end;
+						end);
+					end;
+				end);
+				
+				Player.Character:GetPropertyChangedSignal("Parent"):Connect(function()
+					if Player.Character.Parent == nil then
+						pcall(function()
+							if ESPStorage.Players[Player.UserId].Cube ~= nil then
+								ESPStorage.Players[Player.UserId].Cube:Remove();
+								ESPStorage.Players[Player.UserId].Cube = nil;
+							end;
+							
+							if ESPStorage.Players[Player.UserId].Name ~= nil then
+								ESPStorage.Players[Player.UserId].Name:Remove();
+								ESPStorage.Players[Player.UserId].Name = nil;
+							end;
+						end);
+					end;
+				end);
+				
+				local Humanoid = Player.Character:FindFirstChildOfClass("Humanoid");
+				if Humanoid ~= nil then
+					Humanoid.Died:Connect(function()
+						pcall(function()
+							if ESPStorage.Players[Player.UserId].Cube ~= nil then
+								ESPStorage.Players[Player.UserId].Cube:Remove();
+								ESPStorage.Players[Player.UserId].Cube = nil;
+							end;
+							
+							if ESPStorage.Players[Player.UserId].Name ~= nil then
+								ESPStorage.Players[Player.UserId].Name:Remove();
+								ESPStorage.Players[Player.UserId].Name = nil;
+							end;
+						end);
+					end);
 				end;
 			end;
 		end;
 	else
 		for _, Player in next, Players:GetPlayers() do
 			if ESPStorage.Players[Player.UserId] ~= nil then
-				if ESPStorage.Players[Player.UserId].Cube ~= nil then
-					ESPStorage.Players[Player.UserId].Cube:Remove();
-					ESPStorage.Players[Player.UserId].Cube = nil;
-				end;
+				pcall(function()
+					if ESPStorage.Players[Player.UserId].Cube ~= nil then
+						ESPStorage.Players[Player.UserId].Cube:Remove();
+						ESPStorage.Players[Player.UserId].Cube = nil;
+					end;
+					
+					if ESPStorage.Players[Player.UserId].Name ~= nil then
+						ESPStorage.Players[Player.UserId].Name:Remove();
+						ESPStorage.Players[Player.UserId].Name = nil;
+					end;
+				end);
 				
 				ESPStorage.Players[Player.UserId] = nil;
 			end;
