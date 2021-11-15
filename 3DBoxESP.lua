@@ -774,6 +774,12 @@ function ESP:Toggle()
 	ToggleCallback(ESP.Enabled);
 end;
 
+function ESP:SetTeamCheck(Value)
+	if type(Value) == "boolean" then
+		ESP.TeamColor = Value;
+	end;
+end;
+
 function ESP:ToggleTeam()
 	ESP.TeamColor = not ESP.TeamColor;
 end;
