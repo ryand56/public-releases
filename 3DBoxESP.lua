@@ -361,7 +361,18 @@ local function createESPName(Character)
 				Name.Position = Vector2.new(0, 0);
 				Name.Color = ESP.TeamColor and Player.TeamColor.Color or ESP.DefaultColor;
 				
-				ESPStorage.Players[Player.UserId].Name = Name;
+				local Distance = Drawing.new("Text");
+				Distance.Text = "";
+				Distance.Size = 19;
+				Distance.Center = true;
+				Distance.Outline = true;
+				Distance.Position = Vector2.new(0, 0);
+				Distance.Color = ESP.TeamColor and Player.TeamColor.Color or ESP.DefaultColor;
+				
+				ESPStorage.Players[Player.UserId].Name = {
+					["Name"] = Name,
+					["Distance"] = Distance
+				};
 			end;
 		end;
 	end;
@@ -398,7 +409,16 @@ Players.PlayerAdded:Connect(function(Player)
 								end;
 								
 								if ESPStorage.Players[Player.UserId].Name ~= nil then
-									ESPStorage.Players[Player.UserId].Name:Remove();
+									if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+										ESPStorage.Players[Player.UserId].Name.Name:Remove();
+										ESPStorage.Players[Player.UserId].Name.Name = nil;
+									end;
+									
+									if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+										ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+										ESPStorage.Players[Player.UserId].Name.Distance = nil;
+									end;
+									
 									ESPStorage.Players[Player.UserId].Name = nil;
 								end;
 							end);
@@ -414,7 +434,16 @@ Players.PlayerAdded:Connect(function(Player)
 								end;
 								
 								if ESPStorage.Players[Player.UserId].Name ~= nil then
-									ESPStorage.Players[Player.UserId].Name:Remove();
+									if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+										ESPStorage.Players[Player.UserId].Name.Name:Remove();
+										ESPStorage.Players[Player.UserId].Name.Name = nil;
+									end;
+									
+									if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+										ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+										ESPStorage.Players[Player.UserId].Name.Distance = nil;
+									end;
+									
 									ESPStorage.Players[Player.UserId].Name = nil;
 								end;
 							end);
@@ -431,7 +460,16 @@ Players.PlayerAdded:Connect(function(Player)
 								end;
 								
 								if ESPStorage.Players[Player.UserId].Name ~= nil then
-									ESPStorage.Players[Player.UserId].Name:Remove();
+									if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+										ESPStorage.Players[Player.UserId].Name.Name:Remove();
+										ESPStorage.Players[Player.UserId].Name.Name = nil;
+									end;
+									
+									if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+										ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+										ESPStorage.Players[Player.UserId].Name.Distance = nil;
+									end;
+									
 									ESPStorage.Players[Player.UserId].Name = nil;
 								end;
 							end);
@@ -456,7 +494,16 @@ Players.PlayerRemoving:Connect(function(Player)
 			end;
 			
 			if ESPStorage.Players[Player.UserId].Name ~= nil then
-				ESPStorage.Players[Player.UserId].Name:Remove();
+				if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+					ESPStorage.Players[Player.UserId].Name.Name:Remove();
+					ESPStorage.Players[Player.UserId].Name.Name = nil;
+				end;
+				
+				if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+					ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+					ESPStorage.Players[Player.UserId].Name.Distance = nil;
+				end;
+				
 				ESPStorage.Players[Player.UserId].Name = nil;
 			end;
 			
@@ -589,9 +636,20 @@ RunService:BindToRenderStep("UpdateESP", Enum.RenderPriority.Character.Value, fu
 					if Player ~= nil and Head ~= nil then
 						local HeadPos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(Head.Position);
 						
-						PlayerESP.Name.Position = Vector2.new(HeadPos.X, HeadPos.Y);
-						PlayerESP.Name.Color = ESP.TeamColor and Player.TeamColor.Color or ESP.DefaultColor;
-						PlayerESP.Name.Visible = onScreen;
+						if PlayerESP.Name.Name ~= nil then
+							PlayerESP.Name.Name.Position = Vector2.new(HeadPos.X, HeadPos.Y);
+							PlayerESP.Name.Name.Color = ESP.TeamColor and Player.TeamColor.Color or ESP.DefaultColor;
+							PlayerESP.Name.Name.Visible = onScreen;
+						end;
+						
+						if PlayerESP.Name.Distance ~= nil then
+							pcall(function()
+								PlayerESP.Name.Distance.Text = string.format("%dm away", Player:DistanceFromCharacter(LocalPlayer.Character.Head.Position));
+								PlayerESP.Name.Distance.Position = Vector2.new(HeadPos.X, HeadPos.Y + 15);
+								PlayerESP.Name.Distance.Color = ESP.TeamColor and Player.TeamColor.Color or ESP.DefaultColor;
+								PlayerESP.Name.Distance.Visible = onScreen;
+							end);
+						end;
 					end;
 				end;
 			end;
@@ -633,7 +691,16 @@ local function ToggleCallback(Value)
 									end;
 									
 									if ESPStorage.Players[Player.UserId].Name ~= nil then
-										ESPStorage.Players[Player.UserId].Name:Remove();
+										if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+											ESPStorage.Players[Player.UserId].Name.Name:Remove();
+											ESPStorage.Players[Player.UserId].Name.Name = nil;
+										end;
+										
+										if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+											ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+											ESPStorage.Players[Player.UserId].Name.Distance = nil;
+										end;
+										
 										ESPStorage.Players[Player.UserId].Name = nil;
 									end;
 								end);
@@ -649,7 +716,16 @@ local function ToggleCallback(Value)
 									end;
 									
 									if ESPStorage.Players[Player.UserId].Name ~= nil then
-										ESPStorage.Players[Player.UserId].Name:Remove();
+										if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+											ESPStorage.Players[Player.UserId].Name.Name:Remove();
+											ESPStorage.Players[Player.UserId].Name.Name = nil;
+										end;
+										
+										if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+											ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+											ESPStorage.Players[Player.UserId].Name.Distance = nil;
+										end;
+										
 										ESPStorage.Players[Player.UserId].Name = nil;
 									end;
 								end);
@@ -666,7 +742,16 @@ local function ToggleCallback(Value)
 									end;
 									
 									if ESPStorage.Players[Player.UserId].Name ~= nil then
-										ESPStorage.Players[Player.UserId].Name:Remove();
+										if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+											ESPStorage.Players[Player.UserId].Name.Name:Remove();
+											ESPStorage.Players[Player.UserId].Name.Name = nil;
+										end;
+										
+										if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+											ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+											ESPStorage.Players[Player.UserId].Name.Distance = nil;
+										end;
+										
 										ESPStorage.Players[Player.UserId].Name = nil;
 									end;
 								end);
@@ -695,7 +780,16 @@ local function ToggleCallback(Value)
 							end;
 							
 							if ESPStorage.Players[Player.UserId].Name ~= nil then
-								ESPStorage.Players[Player.UserId].Name:Remove();
+								if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+									ESPStorage.Players[Player.UserId].Name.Name:Remove();
+									ESPStorage.Players[Player.UserId].Name.Name = nil;
+								end;
+								
+								if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+									ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+									ESPStorage.Players[Player.UserId].Name.Distance = nil;
+								end;
+								
 								ESPStorage.Players[Player.UserId].Name = nil;
 							end;
 						end);
@@ -711,7 +805,16 @@ local function ToggleCallback(Value)
 							end;
 							
 							if ESPStorage.Players[Player.UserId].Name ~= nil then
-								ESPStorage.Players[Player.UserId].Name:Remove();
+								if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+									ESPStorage.Players[Player.UserId].Name.Name:Remove();
+									ESPStorage.Players[Player.UserId].Name.Name = nil;
+								end;
+								
+								if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+									ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+									ESPStorage.Players[Player.UserId].Name.Distance = nil;
+								end;
+								
 								ESPStorage.Players[Player.UserId].Name = nil;
 							end;
 						end);
@@ -728,7 +831,16 @@ local function ToggleCallback(Value)
 							end;
 							
 							if ESPStorage.Players[Player.UserId].Name ~= nil then
-								ESPStorage.Players[Player.UserId].Name:Remove();
+								if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+									ESPStorage.Players[Player.UserId].Name.Name:Remove();
+									ESPStorage.Players[Player.UserId].Name.Name = nil;
+								end;
+								
+								if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+									ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+									ESPStorage.Players[Player.UserId].Name.Distance = nil;
+								end;
+								
 								ESPStorage.Players[Player.UserId].Name = nil;
 							end;
 						end);
@@ -746,7 +858,16 @@ local function ToggleCallback(Value)
 					end;
 					
 					if ESPStorage.Players[Player.UserId].Name ~= nil then
-						ESPStorage.Players[Player.UserId].Name:Remove();
+						if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+							ESPStorage.Players[Player.UserId].Name.Name:Remove();
+							ESPStorage.Players[Player.UserId].Name.Name = nil;
+						end;
+						
+						if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+							ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+							ESPStorage.Players[Player.UserId].Name.Distance = nil;
+						end;
+						
 						ESPStorage.Players[Player.UserId].Name = nil;
 					end;
 				end);
@@ -772,6 +893,104 @@ end;
 function ESP:Toggle()
 	ESP.Enabled = not ESP.Enabled;
 	ToggleCallback(ESP.Enabled);
+end;
+
+function ESP:SetBoxes(Value)
+	if type(Value) == "boolean" then
+		ESP.Boxes = Value;
+		
+		for _, Player in next, Players:GetPlayers() do
+			if ESPStorage.Players[Player.UserId] ~= nil then
+				if ESP.Boxes and ESPStorage.Players[Player.UserId].Cube == nil then
+					createESPBox(Player.Character);
+				else
+					pcall(function()
+						if ESPStorage.Players[Player.UserId].Cube ~= nil then
+							ESPStorage.Players[Player.UserId].Cube:Remove();
+							ESPStorage.Players[Player.UserId].Cube = nil;
+						end;
+					end);
+				end;
+			end;
+		end;
+	end;
+end;
+
+function ESP:ToggleBoxes()
+	ESP.Boxes = not ESP.Boxes;
+	
+	for _, Player in next, Players:GetPlayers() do
+		if ESPStorage.Players[Player.UserId] ~= nil then
+			if ESP.Boxes and ESPStorage.Players[Player.UserId].Cube == nil then
+				createESPBox(Player.Character);
+			else
+				pcall(function()
+					if ESPStorage.Players[Player.UserId].Cube ~= nil then
+						ESPStorage.Players[Player.UserId].Cube:Remove();
+						ESPStorage.Players[Player.UserId].Cube = nil;
+					end;
+				end);
+			end;
+		end;
+	end;
+end;
+
+function ESP:SetNames(Value)
+	if type(Value) == "boolean" then
+		ESP.Names = Value;
+		
+		for _, Player in next, Players:GetPlayers() do
+			if ESPStorage.Players[Player.UserId] ~= nil then
+				if ESP.Names and ESPStorage.Players[Player.UserId].Name == nil then
+					createESPName(Player.Character);
+				else
+					pcall(function()
+						if ESPStorage.Players[Player.UserId].Name ~= nil then
+							if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+								ESPStorage.Players[Player.UserId].Name.Name:Remove();
+								ESPStorage.Players[Player.UserId].Name.Name = nil;
+							end;
+							
+							if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+								ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+								ESPStorage.Players[Player.UserId].Name.Distance = nil;
+							end;
+							
+							ESPStorage.Players[Player.UserId].Name = nil;
+						end;
+					end);
+				end;
+			end;
+		end;
+	end;
+end;
+
+function ESP:ToggleNames()
+	ESP.Names = not ESP.Names;
+	
+	for _, Player in next, Players:GetPlayers() do
+		if ESPStorage.Players[Player.UserId] ~= nil then
+			if ESP.Names and ESPStorage.Players[Player.UserId].Name == nil then
+				createESPName(Player.Character);
+			else
+				pcall(function()
+					if ESPStorage.Players[Player.UserId].Name ~= nil then
+						if ESPStorage.Players[Player.UserId].Name.Name ~= nil then
+							ESPStorage.Players[Player.UserId].Name.Name:Remove();
+							ESPStorage.Players[Player.UserId].Name.Name = nil;
+						end;
+						
+						if ESPStorage.Players[Player.UserId].Name.Distance ~= nil then
+							ESPStorage.Players[Player.UserId].Name.Distance:Remove();
+							ESPStorage.Players[Player.UserId].Name.Distance = nil;
+						end;
+						
+						ESPStorage.Players[Player.UserId].Name = nil;
+					end;
+				end);
+			end;
+		end;
+	end;
 end;
 
 function ESP:SetTeamCheck(Value)
