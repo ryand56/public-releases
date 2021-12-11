@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService");
 
 -- Returns a Window object that contains controls
 function Library:Window(Title: string, Color: Color3)
-    local WColor = typeof(Color) ~= "Color3" and Color or Color3.fromRGB(255, 255, 255);
+    local WColor = typeof(Color) == "Color3" and Color or Color3.fromRGB(255, 255, 255);
 
     local W = {
         Name = Title,
