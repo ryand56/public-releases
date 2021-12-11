@@ -4,7 +4,9 @@ local CoreGui = game:GetService("CoreGui");
 local RunService = game:GetService("RunService");
 
 -- Returns a Window object that contains controls
-function Library:Window(Title: string)
+function Library:Window(Title: string, Color: Color3)
+    local WColor = typeof(Color) ~= "Color3" and Color or Color3.fromRGB(255, 255, 255);
+
     local W = {
         Name = Title,
         Tabs = 0
@@ -33,7 +35,7 @@ function Library:Window(Title: string)
     WFGradient.Parent = WindowFrame;
 
     local WFHeader = Instance.new("Frame");
-    WFHeader.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+    WFHeader.BackgroundColor3 = WColor;
     WFHeader.BorderColor3 = Color3.fromRGB(0, 0, 0);
     WFHeader.BorderSizePixel = 2;
     WFHeader.Name = "Header";
@@ -88,7 +90,7 @@ function Library:Window(Title: string)
     SCMainTHLayout.Parent = SCMainTabHolder;
 
     local SCHeader = Instance.new("Frame");
-    SCHeader.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+    SCHeader.BackgroundColor3 = WColor;
     SCHeader.BorderColor3 = Color3.fromRGB(0, 0, 0);
     SCHeader.BorderSizePixel = 2;
     SCHeader.Name = "Header";
@@ -110,20 +112,6 @@ function Library:Window(Title: string)
     WCTitle:GetPropertyChangedSignal("Text"):Connect(function()
         W.Name = WCTitle.Text;
     end);
-
-    local Tick = 5;
-
-    coroutine.resume(coroutine.create(function()
-        while true do
-            local Hue = tick() % Tick / Tick;
-            local Color = Color3.fromHSV(Hue, 1, 1);
-
-            WFHeader.BackgroundColor3 = Color;
-            SCHeader.BackgroundColor3 = Color;
-
-            RunService.Heartbeat:Wait();
-        end;
-    end));
 
     function W:Tab(TabTitle: string)
         if self.Tabs < 5 then
@@ -215,6 +203,7 @@ function Library:Window(Title: string)
                 SCMainTabSection.Parent = SCMainTabContent;
 
                 local SCMainTabSectHeader = Instance.new("Frame");
+                SCMainTabSectHeader.BackgroundColor3 = WColor;
                 SCMainTabSectHeader.BorderColor3 = Color3.fromRGB(0, 0, 0);
                 SCMainTabSectHeader.BorderSizePixel = 2;
                 SCMainTabSectHeader.Name = "Header";
@@ -252,17 +241,6 @@ function Library:Window(Title: string)
                 SCMainTabSectCLayout.SortOrder = Enum.SortOrder.LayoutOrder;
                 SCMainTabSectCLayout.VerticalAlignment = Enum.VerticalAlignment.Top;
                 SCMainTabSectCLayout.Parent = SCMainTabSectContent;
-
-                coroutine.resume(coroutine.create(function()
-                    while true do
-                        local Hue = tick() % Tick / Tick;
-                        local Color = Color3.fromHSV(Hue, 1, 1);
-            
-                        SCMainTabSectHeader.BackgroundColor3 = Color;
-            
-                        RunService.Heartbeat:Wait();
-                    end;
-                end));
 
                 function S:Toggle(Text: string, Checked: boolean, Callback)
                     if type(Callback) == "function" then
