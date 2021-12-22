@@ -3,6 +3,7 @@ local Library = {};
 local UserInputService = game:GetService("UserInputService");
 local TweenService = game:GetService("TweenService");
 local TweenInformation = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, false, 0);
+local RunService = game:GetService("RunService");
 
 local CoreGui = game:GetService("CoreGui");
 local MainUI = Instance.new("ScreenGui", CoreGui);
@@ -201,7 +202,8 @@ function Library:Window(Title: string)
         end;
 
         local T = {
-            State = Value
+            State = Value,
+            Debounce = false
         };
 
         local WindowCHToggleLabel = Instance.new("TextLabel");
@@ -241,15 +243,67 @@ function Library:Window(Title: string)
         WindowCHToggleGrad.Parent = WindowCHToggle;
 
         WindowCHToggle.MouseButton1Click:Connect(function()
+            local StartTweenValues = {
+                ["Color0"] = T.State and 175 or 94,
+                ["Color1"] = T.State and 230 or 116
+            };
+
             T.State = not T.State;
-            WindowCHToggleGrad.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, T.State and Color3.fromRGB(175, 175, 175) or Color3.fromRGB(94, 94, 94)),
-                ColorSequenceKeypoint.new(1, T.State and Color3.fromRGB(230, 230, 230) or Color3.fromRGB(116, 116, 116))
-            });
+
+            local EndTweenValues = {
+                ["Color0"] = T.State and 175 or 94,
+                ["Color1"] = T.State and 230 or 116
+            };
+
+            coroutine.resume(coroutine.create(function()
+                while true do
+                    if not T.Debounce then
+                        if T.State and ((StartTweenValues.Color0 - EndTweenValues.Color0) < 0 or (StartTweenValues.Color1 - EndTweenValues.Color1) < 0) then
+                            T.Debounce = true;
+
+                            if StartTweenValues.Color0 >= EndTweenValues.Color0 and StartTweenValues.Color1 >= EndTweenValues.Color1 then
+                                T.Debounce = false;
+                                coroutine.yield();
+                            end;
+        
+                            if StartTweenValues.Color0 <= EndTweenValues.Color0 then
+                                StartTweenValues.Color0 = StartTweenValues.Color0 + 1;
+                            end;
+        
+                            if StartTweenValues.Color1 <= EndTweenValues.Color1 then
+                                StartTweenValues.Color1 = StartTweenValues.Color1 + 1;
+                            end;
+                        elseif not T.State and ((StartTweenValues.Color0 - EndTweenValues.Color0) >= 0 or (StartTweenValues.Color1 - EndTweenValues.Color1) >= 0) then
+                            T.Debounce = true;
+
+                            if StartTweenValues.Color0 <= EndTweenValues.Color0 and StartTweenValues.Color1 <= EndTweenValues.Color1 then
+                                T.Debounce = false;
+                                coroutine.yield();
+                            end;
+        
+                            if StartTweenValues.Color0 > EndTweenValues.Color0 then
+                                StartTweenValues.Color0 = StartTweenValues.Color0 - 1;
+                            end;
+        
+                            if StartTweenValues.Color1 > EndTweenValues.Color1 then
+                                StartTweenValues.Color1 = StartTweenValues.Color1 - 1;
+                            end;
+                        end;
+    
+                        WindowCHToggleGrad.Color = ColorSequence.new({
+                            ColorSequenceKeypoint.new(0, Color3.fromRGB(StartTweenValues.Color0, StartTweenValues.Color0, StartTweenValues.Color0)),
+                            ColorSequenceKeypoint.new(1, Color3.fromRGB(StartTweenValues.Color1, StartTweenValues.Color1, StartTweenValues.Color1))
+                        });
+                    else
+                        coroutine.yield();
+                    end;
+
+                    RunService.Heartbeat:Wait();
+                end;
+            end));
+
             Callback(T.State);
         end);
-
-        return T;
     end;
 
     WindowMinimize.MouseButton1Click:Connect(function()
