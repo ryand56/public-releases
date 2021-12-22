@@ -2,6 +2,7 @@ local Library = {};
 
 local UserInputService = game:GetService("UserInputService");
 local TweenService = game:GetService("TweenService");
+local TweenInformation = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, false, 0);
 
 local CoreGui = game:GetService("CoreGui");
 local MainUI = Instance.new("ScreenGui", CoreGui);
@@ -158,6 +159,7 @@ function Library:Window(Title: string)
         end;
 
         local WindowCHButton = Instance.new("TextButton");
+        WindowCHButton.AutoButtonColor = false;
         WindowCHButton.BackgroundColor3 = Color3.fromRGB(90, 90, 90);
         WindowCHButton.BorderColor3 = Color3.fromRGB(75, 75, 75);
         WindowCHButton.BorderSizePixel = 2;
@@ -175,6 +177,20 @@ function Library:Window(Title: string)
         WindowCHButtonStroke.Thickness = 1;
         WindowCHButtonStroke.Transparency = 0;
         WindowCHButtonStroke.Parent = WindowCHButton;
+
+        WindowCHButton.MouseEnter:Connect(function()
+            local EnterTween = TweenService:Create(WindowCHButton, TweenInformation, {
+                ["BackgroundColor3"] = Color3.fromRGB(65, 65, 65)
+            });
+            EnterTween:Play();
+        end);
+
+        WindowCHButton.MouseLeave:Connect(function()
+            local ExitTween = TweenService:Create(WindowCHButton, TweenInformation, {
+                ["BackgroundColor3"] = Color3.fromRGB(90, 90, 90)
+            });
+            ExitTween:Play();
+        end);
 
         WindowCHButton.MouseButton1Click:Connect(Callback);
     end;
@@ -237,8 +253,6 @@ function Library:Window(Title: string)
     end;
 
     WindowMinimize.MouseButton1Click:Connect(function()
-        local TweenInformation = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, false, 0);
-        
         if not W.Minimized then
             for _, Child in next, WindowContentHolder:GetChildren() do
                 if Child:IsA("TextLabel") then
