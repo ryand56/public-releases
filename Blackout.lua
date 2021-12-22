@@ -3,6 +3,11 @@ local Library = {};
 local CoreGui = game:GetService("CoreGui");
 local RunService = game:GetService("RunService");
 
+local Players = game:GetService("Players");
+local LocalPlayer = Players.LocalPlayer;
+
+local UserInputService = game:GetService("UserInputService");
+
 -- Returns a Window object that contains controls
 function Library:Window(Title: string, Color: Color3)
     local WColor = typeof(Color) == "Color3" and Color or Color3.fromRGB(255, 255, 255);
@@ -188,164 +193,248 @@ function Library:Window(Title: string, Color: Color3)
             end);
 
             function T:Section(SectTitle: string)
-                local S = {
-                    Name = SectTitle
-                };
+                if self.Sections < 4 then
+                    local S = {
+                        Name = SectTitle
+                    };
 
-                self.Sections += 1;
+                    self.Sections += 1;
 
-                local SCMainTabSection = Instance.new("Frame");
-                SCMainTabSection.BackgroundColor3 = Color3.fromRGB(40, 40, 40);
-                SCMainTabSection.BorderColor3 = Color3.fromRGB(0, 0, 0);
-                SCMainTabSection.BorderSizePixel = 2;
-                SCMainTabSection.LayoutOrder = self.Sections;
-                SCMainTabSection.Name = "TabSection" .. self.Sections;
-                SCMainTabSection.Parent = SCMainTabContent;
+                    local SCMainTabSection = Instance.new("Frame");
+                    SCMainTabSection.BackgroundColor3 = Color3.fromRGB(40, 40, 40);
+                    SCMainTabSection.BorderColor3 = Color3.fromRGB(0, 0, 0);
+                    SCMainTabSection.BorderSizePixel = 2;
+                    SCMainTabSection.LayoutOrder = self.Sections;
+                    SCMainTabSection.Name = "TabSection" .. self.Sections;
+                    SCMainTabSection.Parent = SCMainTabContent;
 
-                local SCMainTabSectHeader = Instance.new("Frame");
-                SCMainTabSectHeader.BackgroundColor3 = WColor;
-                SCMainTabSectHeader.BorderColor3 = Color3.fromRGB(0, 0, 0);
-                SCMainTabSectHeader.BorderSizePixel = 2;
-                SCMainTabSectHeader.Name = "Header";
-                SCMainTabSectHeader.Position = UDim2.new();
-                SCMainTabSectHeader.Size = UDim2.fromOffset(224, 3);
-                SCMainTabSectHeader.Parent = SCMainTabSection;
+                    local SCMainTabSectHeader = Instance.new("Frame");
+                    SCMainTabSectHeader.BackgroundColor3 = WColor;
+                    SCMainTabSectHeader.BorderColor3 = Color3.fromRGB(0, 0, 0);
+                    SCMainTabSectHeader.BorderSizePixel = 2;
+                    SCMainTabSectHeader.Name = "Header";
+                    SCMainTabSectHeader.Position = UDim2.new();
+                    SCMainTabSectHeader.Size = UDim2.fromOffset(224, 3);
+                    SCMainTabSectHeader.Parent = SCMainTabSection;
 
-                local SCMainTabSHTitle = Instance.new("TextLabel");
-                SCMainTabSHTitle.BackgroundTransparency = 1;
-                SCMainTabSHTitle.Name = "Title";
-                SCMainTabSHTitle.Position = UDim2.fromScale(0.045, 3);
-                SCMainTabSHTitle.Size = UDim2.fromOffset(204, 16);
-                SCMainTabSHTitle.Font = Enum.Font.SourceSans;
-                SCMainTabSHTitle.Text = SectTitle;
-                SCMainTabSHTitle.TextColor3 = Color3.fromRGB(255, 255, 255);
-                SCMainTabSHTitle.TextSize = 20;
-                SCMainTabSHTitle.TextXAlignment = Enum.TextXAlignment.Left;
-                SCMainTabSHTitle.Parent = SCMainTabSectHeader;
+                    local SCMainTabSHTitle = Instance.new("TextLabel");
+                    SCMainTabSHTitle.BackgroundTransparency = 1;
+                    SCMainTabSHTitle.Name = "Title";
+                    SCMainTabSHTitle.Position = UDim2.fromScale(0.045, 3);
+                    SCMainTabSHTitle.Size = UDim2.fromOffset(204, 16);
+                    SCMainTabSHTitle.Font = Enum.Font.SourceSans;
+                    SCMainTabSHTitle.Text = SectTitle;
+                    SCMainTabSHTitle.TextColor3 = Color3.fromRGB(255, 255, 255);
+                    SCMainTabSHTitle.TextSize = 20;
+                    SCMainTabSHTitle.TextXAlignment = Enum.TextXAlignment.Left;
+                    SCMainTabSHTitle.Parent = SCMainTabSectHeader;
 
-                SCMainTabSHTitle:GetPropertyChangedSignal("Text"):Connect(function()
-                    S.Name = SCMainTabSHTitle.Text;
-                end);
+                    SCMainTabSHTitle:GetPropertyChangedSignal("Text"):Connect(function()
+                        S.Name = SCMainTabSHTitle.Text;
+                    end);
 
-                local SCMainTabSectContent = Instance.new("Frame");
-                SCMainTabSectContent.BackgroundTransparency = 1;
-                SCMainTabSectContent.Name = "SectionContent";
-                SCMainTabSectContent.Position = UDim2.fromScale(0.044, 0.147);
-                SCMainTabSectContent.Size = UDim2.fromOffset(204, 183);
-                SCMainTabSectContent.Parent = SCMainTabSection;
+                    local SCMainTabSectContent = Instance.new("Frame");
+                    SCMainTabSectContent.BackgroundTransparency = 1;
+                    SCMainTabSectContent.Name = "SectionContent";
+                    SCMainTabSectContent.Position = UDim2.fromScale(0.044, 0.147);
+                    SCMainTabSectContent.Size = UDim2.fromOffset(204, 183);
+                    SCMainTabSectContent.Parent = SCMainTabSection;
 
-                local SCMainTabSectCLayout = Instance.new("UIListLayout");
-                SCMainTabSectCLayout.Padding = UDim.new(0, 5);
-                SCMainTabSectCLayout.FillDirection = Enum.FillDirection.Vertical;
-                SCMainTabSectCLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left;
-                SCMainTabSectCLayout.SortOrder = Enum.SortOrder.LayoutOrder;
-                SCMainTabSectCLayout.VerticalAlignment = Enum.VerticalAlignment.Top;
-                SCMainTabSectCLayout.Parent = SCMainTabSectContent;
+                    local SCMainTabSectCLayout = Instance.new("UIListLayout");
+                    SCMainTabSectCLayout.Padding = UDim.new(0, 5);
+                    SCMainTabSectCLayout.FillDirection = Enum.FillDirection.Vertical;
+                    SCMainTabSectCLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left;
+                    SCMainTabSectCLayout.SortOrder = Enum.SortOrder.LayoutOrder;
+                    SCMainTabSectCLayout.VerticalAlignment = Enum.VerticalAlignment.Top;
+                    SCMainTabSectCLayout.Parent = SCMainTabSectContent;
 
-                function S:Toggle(Text: string, Checked: boolean, Callback)
-                    if type(Callback) == "function" then
-                        local Toggle = {
-                            State = Checked
-                        };
+                    function S:Toggle(Text: string, Checked: boolean, Callback)
+                        if type(Callback) == "function" then
+                            local Toggle = {
+                                State = Checked
+                            };
 
-                        local SCMainTabSectCToggleLabel = Instance.new("TextLabel");
-                        SCMainTabSectCToggleLabel.BackgroundTransparency = 1;
-                        SCMainTabSectCToggleLabel.Name = "Toggle";
-                        SCMainTabSectCToggleLabel.Size = UDim2.fromOffset(70, 23);
-                        SCMainTabSectCToggleLabel.Font = Enum.Font.SourceSans;
-                        SCMainTabSectCToggleLabel.Text = Text;
-                        SCMainTabSectCToggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
-                        SCMainTabSectCToggleLabel.TextScaled = true;
-                        SCMainTabSectCToggleLabel.TextXAlignment = Enum.TextXAlignment.Left;
-                        SCMainTabSectCToggleLabel.Parent = SCMainTabSectContent;
+                            local SCMainTabSectCToggleLabel = Instance.new("TextLabel");
+                            SCMainTabSectCToggleLabel.BackgroundTransparency = 1;
+                            SCMainTabSectCToggleLabel.Name = "Toggle";
+                            SCMainTabSectCToggleLabel.Size = UDim2.fromOffset(70, 23);
+                            SCMainTabSectCToggleLabel.Font = Enum.Font.SourceSans;
+                            SCMainTabSectCToggleLabel.Text = Text;
+                            SCMainTabSectCToggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+                            SCMainTabSectCToggleLabel.TextScaled = true;
+                            SCMainTabSectCToggleLabel.TextXAlignment = Enum.TextXAlignment.Left;
+                            SCMainTabSectCToggleLabel.Parent = SCMainTabSectContent;
 
-                        local SCMainTabSectCToggle = Instance.new("TextButton");
-                        SCMainTabSectCToggle.AutoButtonColor = false;
-                        SCMainTabSectCToggle.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
-                        SCMainTabSectCToggle.BorderColor3 = Color3.fromRGB(0, 0, 0);
-                        SCMainTabSectCToggle.BorderSizePixel = 2;
-                        SCMainTabSectCToggle.Name = "Toggle";
-                        SCMainTabSectCToggle.Position = UDim2.fromScale(0.7, 0.174);
-                        SCMainTabSectCToggle.Size = UDim2.fromOffset(15, 15);
-                        SCMainTabSectCToggle.Font = Enum.Font.SourceSans;
-                        SCMainTabSectCToggle.Text = "";
-                        SCMainTabSectCToggle.Parent = SCMainTabSectCToggleLabel;
+                            local SCMainTabSectCToggle = Instance.new("TextButton");
+                            SCMainTabSectCToggle.AutoButtonColor = false;
+                            SCMainTabSectCToggle.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+                            SCMainTabSectCToggle.BorderColor3 = Color3.fromRGB(0, 0, 0);
+                            SCMainTabSectCToggle.BorderSizePixel = 2;
+                            SCMainTabSectCToggle.Name = "Toggle";
+                            SCMainTabSectCToggle.Position = UDim2.fromScale(0.7, 0.174);
+                            SCMainTabSectCToggle.Size = UDim2.fromOffset(15, 15);
+                            SCMainTabSectCToggle.Font = Enum.Font.SourceSans;
+                            SCMainTabSectCToggle.Text = "";
+                            SCMainTabSectCToggle.Parent = SCMainTabSectCToggleLabel;
 
-                        local SCMainTabSectCToggleGradient = Instance.new("UIGradient");
-                        SCMainTabSectCToggleGradient.Color = ColorSequence.new({
-                            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-                            ColorSequenceKeypoint.new(1, Color3.fromRGB(13, 13, 13))
-                        });
-                        SCMainTabSectCToggleGradient.Offset = Vector2.new(0, -0.5);
-                        SCMainTabSectCToggleGradient.Rotation = 90;
-                        SCMainTabSectCToggleGradient.Parent = SCMainTabSectCToggle;
+                            local SCMainTabSectCToggleGradient = Instance.new("UIGradient");
+                            SCMainTabSectCToggleGradient.Color = ColorSequence.new({
+                                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+                                ColorSequenceKeypoint.new(1, Color3.fromRGB(13, 13, 13))
+                            });
+                            SCMainTabSectCToggleGradient.Offset = Vector2.new(0, -0.5);
+                            SCMainTabSectCToggleGradient.Rotation = 90;
+                            SCMainTabSectCToggleGradient.Parent = SCMainTabSectCToggle;
 
-                        local SCMainTabSectCToggleImage = Instance.new("ImageLabel");
-                        SCMainTabSectCToggleImage.BackgroundTransparency = 1;
-                        SCMainTabSectCToggleImage.Name = "Check";
-                        SCMainTabSectCToggleImage.Position = UDim2.new();
-                        SCMainTabSectCToggleImage.Size = UDim2.fromOffset(15, 15);
-                        SCMainTabSectCToggleImage.Visible = Toggle.State;
-                        SCMainTabSectCToggleImage.Image = "rbxassetid://6290039376";
-                        SCMainTabSectCToggleImage.ImageColor3 = Color3.fromRGB(255, 255, 255);
-                        SCMainTabSectCToggleImage.ResampleMode = Enum.ResamplerMode.Default;
-                        SCMainTabSectCToggleImage.ScaleType = Enum.ScaleType.Fit;
-                        SCMainTabSectCToggleImage.Parent = SCMainTabSectCToggle;
+                            local SCMainTabSectCToggleImage = Instance.new("ImageLabel");
+                            SCMainTabSectCToggleImage.BackgroundTransparency = 1;
+                            SCMainTabSectCToggleImage.Name = "Check";
+                            SCMainTabSectCToggleImage.Position = UDim2.new();
+                            SCMainTabSectCToggleImage.Size = UDim2.fromOffset(15, 15);
+                            SCMainTabSectCToggleImage.Visible = Toggle.State;
+                            SCMainTabSectCToggleImage.Image = "rbxassetid://6290039376";
+                            SCMainTabSectCToggleImage.ImageColor3 = Color3.fromRGB(255, 255, 255);
+                            SCMainTabSectCToggleImage.ResampleMode = Enum.ResamplerMode.Default;
+                            SCMainTabSectCToggleImage.ScaleType = Enum.ScaleType.Fit;
+                            SCMainTabSectCToggleImage.Parent = SCMainTabSectCToggle;
 
-                        SCMainTabSectCToggle.MouseButton1Click:Connect(function()
-                            Toggle.State = not Toggle.State;
+                            SCMainTabSectCToggle.MouseButton1Click:Connect(function()
+                                Toggle.State = not Toggle.State;
 
-                            if Toggle.State then
-                                SCMainTabSectCToggleImage.Visible = true;
-                            else
-                                SCMainTabSectCToggleImage.Visible = false;
-                            end;
+                                if Toggle.State then
+                                    SCMainTabSectCToggleImage.Visible = true;
+                                else
+                                    SCMainTabSectCToggleImage.Visible = false;
+                                end;
 
-                            Callback(Toggle.State);
-                        end);
+                                Callback(Toggle.State);
+                            end);
 
-                        return Toggle;
+                            return Toggle;
+                        end;
                     end;
-                end;
 
-                function S:Button(Text: string, Callback)
-                    if type(Callback) == "function" then
-                        local SCMainTabSectCButton = Instance.new("TextButton");
-                        SCMainTabSectCButton.AutoButtonColor = false;
-                        SCMainTabSectCButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
-                        SCMainTabSectCButton.BorderColor3 = Color3.fromRGB(0, 0, 0);
-                        SCMainTabSectCButton.BorderSizePixel = 2;
-                        SCMainTabSectCButton.Name = "Button";
-                        SCMainTabSectCButton.Size = UDim2.fromOffset(135, 22);
-                        SCMainTabSectCButton.Font = Enum.Font.SourceSans;
-                        SCMainTabSectCButton.Text = "";
-                        SCMainTabSectCButton.Parent = SCMainTabSectContent;
+                    function S:Button(Text: string, Callback)
+                        if type(Callback) == "function" then
+                            local SCMainTabSectCButton = Instance.new("TextButton");
+                            SCMainTabSectCButton.AutoButtonColor = false;
+                            SCMainTabSectCButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+                            SCMainTabSectCButton.BorderColor3 = Color3.fromRGB(0, 0, 0);
+                            SCMainTabSectCButton.BorderSizePixel = 2;
+                            SCMainTabSectCButton.Name = "Button";
+                            SCMainTabSectCButton.Size = UDim2.fromOffset(135, 22);
+                            SCMainTabSectCButton.Font = Enum.Font.SourceSans;
+                            SCMainTabSectCButton.Text = "";
+                            SCMainTabSectCButton.Parent = SCMainTabSectContent;
 
-                        local SCMainTabSectCBGradient = Instance.new("UIGradient");
-                        SCMainTabSectCBGradient.Color = ColorSequence.new({
-                            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-                            ColorSequenceKeypoint.new(1, Color3.fromRGB(13, 13, 13))
-                        });
-                        SCMainTabSectCBGradient.Offset = Vector2.new(0, -0.5);
-                        SCMainTabSectCBGradient.Rotation = 90;
-                        SCMainTabSectCBGradient.Parent = SCMainTabSectCButton;
+                            local SCMainTabSectCBGradient = Instance.new("UIGradient");
+                            SCMainTabSectCBGradient.Color = ColorSequence.new({
+                                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+                                ColorSequenceKeypoint.new(1, Color3.fromRGB(13, 13, 13))
+                            });
+                            SCMainTabSectCBGradient.Offset = Vector2.new(0, -0.5);
+                            SCMainTabSectCBGradient.Rotation = 90;
+                            SCMainTabSectCBGradient.Parent = SCMainTabSectCButton;
 
-                        local SCMainTabSectCButtonLabel = Instance.new("TextLabel");
-                        SCMainTabSectCButtonLabel.BackgroundTransparency = 1;
-                        SCMainTabSectCButtonLabel.Name = "Label";
-                        SCMainTabSectCButtonLabel.Position = UDim2.new();
-                        SCMainTabSectCButtonLabel.Size = UDim2.fromOffset(135, 22);
-                        SCMainTabSectCButtonLabel.Font = Enum.Font.SourceSans;
-                        SCMainTabSectCButtonLabel.Text = Text;
-                        SCMainTabSectCButtonLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
-                        SCMainTabSectCButtonLabel.TextSize = 18;
-                        SCMainTabSectCButtonLabel.Parent = SCMainTabSectCButton;
+                            local SCMainTabSectCButtonLabel = Instance.new("TextLabel");
+                            SCMainTabSectCButtonLabel.BackgroundTransparency = 1;
+                            SCMainTabSectCButtonLabel.Name = "Label";
+                            SCMainTabSectCButtonLabel.Position = UDim2.new();
+                            SCMainTabSectCButtonLabel.Size = UDim2.fromOffset(135, 22);
+                            SCMainTabSectCButtonLabel.Font = Enum.Font.SourceSans;
+                            SCMainTabSectCButtonLabel.Text = Text;
+                            SCMainTabSectCButtonLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+                            SCMainTabSectCButtonLabel.TextSize = 18;
+                            SCMainTabSectCButtonLabel.Parent = SCMainTabSectCButton;
 
-                        SCMainTabSectCButton.MouseButton1Click:Connect(Callback);
+                            SCMainTabSectCButton.MouseButton1Click:Connect(Callback);
+                        end;
                     end;
-                end;
 
-                return S;
+                    function S:Slider(Text: string, Default: number, Min: number, Max: number, Callback)
+                        if type(Callback) == "function" and Default >= Min and Default <= Max then
+                            local Slider = {
+                                Down = false
+                            };
+
+                            local SCMainTabSectCSlider = Instance.new("Frame");
+                            SCMainTabSectCSlider.BackgroundColor3 = Color3.fromRGB(25, 25, 25);
+                            SCMainTabSectCSlider.BorderColor3 = Color3.fromRGB(0, 0, 0);
+                            SCMainTabSectCSlider.BorderSizePixel = 2;
+                            SCMainTabSectCSlider.Name = "Slider";
+                            SCMainTabSectCSlider.Size = UDim2.fromOffset(204, 16);
+                            SCMainTabSectCSlider.Parent = SCMainTabSectContent;
+
+                            local SCMainTabSectCSInteract = Instance.new("TextButton");
+                            SCMainTabSectCSInteract.AutoButtonColor = false;
+                            SCMainTabSectCSInteract.BackgroundTransparency = 1;
+                            SCMainTabSectCSInteract.Name = "SliderInteract";
+                            SCMainTabSectCSInteract.Position = UDim2.new();
+                            SCMainTabSectCSInteract.Size = UDim2.fromOffset(204, 16);
+                            SCMainTabSectCSInteract.Text = "";
+                            SCMainTabSectCSInteract.Parent = SCMainTabSectCSlider;
+
+                            local SCMainTabSectCSInteractAP = Vector2.new(SCMainTabSectCSInteract.AbsolutePosition.X, SCMainTabSectCSInteract.AbsolutePosition.Y);
+                            local SCMainTabSectCSInteractAS = Vector2.new(SCMainTabSectCSInteract.AbsoluteSize.X, SCMainTabSectCSInteract.AbsoluteSize.Y);
+
+                            local SCMainTabSectCSBar = Instance.new("Frame");
+                            SCMainTabSectCSBar.BackgroundColor3 = Color3.fromRGB(50, 50, 50);
+                            SCMainTabSectCSBar.BorderSizePixel = 0;
+                            SCMainTabSectCSBar.Name = "SliderBar";
+                            SCMainTabSectCSBar.Position = UDim2.new();
+                            SCMainTabSectCSBar.Size = UDim2.fromOffset(0, 16);
+                            SCMainTabSectCSBar.Parent = SCMainTabSectCSInteract;
+
+                            local SCMainTabSectCSLabel = Instance.new("TextLabel");
+                            SCMainTabSectCSLabel.BackgroundTransparency = 1;
+                            SCMainTabSectCSLabel.Name = "SliderLabel";
+                            SCMainTabSectCSLabel.Position = UDim2.new();
+                            SCMainTabSectCSLabel.Size = UDim2.fromOffset(204, 16);
+                            SCMainTabSectCSLabel.Font = Enum.Font.SourceSans;
+                            SCMainTabSectCSLabel.Text = Text;
+                            SCMainTabSectCSLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+                            SCMainTabSectCSLabel.Parent = SCMainTabSectCSInteract;
+
+                            SCMainTabSectCSInteract.MouseButton1Down:Connect(function()
+                                local Location = UserInputService:GetMouseLocation();
+                                local Percent = (Location.X - SCMainTabSectCSInteractAP.X) / SCMainTabSectCSInteractAS.X;
+
+                                Percent = math.clamp(Percent, 0, 1);
+                                local Value = math.floor(Min + (Max - Min) * Percent);
+
+                                SCMainTabSectCSBar.Size = UDim2.new(Percent, 0, 0, 16);
+                                Slider.Down = true;
+
+                                Callback(Value);
+                            end);
+
+                            UserInputService.InputChanged:Connect(function(input, gameProcessed)
+                                if input.UserInputType == Enum.UserInputType.MouseMovement then
+                                    if Slider.Down then
+                                        local Location = UserInputService:GetMouseLocation();
+
+                                        if Location.X < SCMainTabSectCSInteractAP.X then
+                                            SCMainTabSectCSBar.Size = UDim2.new(0, 0, 0, 16);
+                                        elseif Location.X > (SCMainTabSectCSInteractAP.X + SCMainTabSectCSInteractAS.X) then
+                                            SCMainTabSectCSBar.Size = UDim2.new(0, SCMainTabSectCSInteractAS.X, 0, 16);
+                                            Callback(Max);
+                                        else
+                                            SCMainTabSectCSBar.Size = UDim2.new(0, (Location.X - SCMainTabSectCSInteractAP.X), 0, 16);
+                                        end;
+                                    end;
+                                end;
+                            end);
+
+                            UserInputService.InputEnded:Connect(function(input, gameProcessed)
+                                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                    Slider.Down = false;
+                                end;
+                            end);
+                        end;
+                    end;
+
+                    return S;
+                end;
             end;
 
             return T;
