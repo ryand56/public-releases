@@ -306,6 +306,97 @@ function Library:Window(Title: string)
         end);
     end;
 
+    function W:Slider(Text: string, Min: number, Max: number, Value: number, Callback)
+        if type(Callback) ~= "function" then
+            error("Callback must be a function");
+        end;
+
+        if Min <= Value and Max >= Value then
+            local SliderLabel = Instance.new("TextLabel");
+            SliderLabel.BackgroundTransparency = 1;
+            SliderLabel.Name = Text;
+            SliderLabel.Size = UDim2.fromOffset(151, 21);
+            SliderLabel.Font = Enum.Font.TitilliumWeb;
+            SliderLabel.Text = Text;
+            SliderLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+            SliderLabel.TextSize = 20;
+            SliderLabel.Parent = WindowContentHolder;
+
+            local SliderLabelStroke = Instance.new("UIStroke");
+            SliderLabelStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual;
+            SliderLabelStroke.Color = Color3.fromRGB(32, 32, 32);
+            SliderLabelStroke.LineJoinMode = Enum.LineJoinMode.Round;
+            SliderLabelStroke.Thickness = 1;
+            SliderLabelStroke.Transparency = 0;
+            SliderLabelStroke.Parent = SliderLabel;
+
+            local SliderBar = Instance.new("Frame");
+            SliderBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+            SliderBar.BorderColor3 = Color3.fromRGB(75, 75, 75);
+            SliderBar.BorderSizePixel = 2;
+            SliderBar.Name = "Bar";
+            SliderBar.Position = UDim2.fromScale(0.026, 1.333);
+            SliderBar.Size = UDim2.fromOffset(141, 2);
+            SliderBar.Parent = SliderLabel;
+
+            local SliderBarGrad = Instance.new("UIGradient");
+            SliderBarGrad.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(175, 175, 175)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(230, 230, 230))
+            });
+            SliderBarGrad.Rotation = -90;
+            SliderBarGrad.Parent = SliderBar;
+
+            local SliderBox = Instance.new("TextButton");
+            SliderBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+            SliderBox.Name = "SliderBox";
+            SliderBox.Position = UDim2.fromScale(0, -4);
+            SliderBox.Size = UDim2.fromOffset(5, 18);
+            SliderBox.Text = "";
+            SliderBox.Parent = SliderBar;
+
+            local SliderBoxGrad = Instance.new("UIGradient");
+            SliderBoxGrad.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(175, 175, 175)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(230, 230, 230))
+            });
+            SliderBoxGrad.Rotation = -90;
+            SliderBoxGrad.Parent = SliderBox;
+
+            SliderBox.MouseButton1Down:Connect(function()
+                local MouseMove, MouseKill;
+
+                MouseMove = UserInputService.InputChanged:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseMovement then
+                        local MousePos = UserInputService:GetMouseLocation().X;
+                        local ButtonPos = SliderBox.Position;
+
+                        local SliderSize = SliderBar.AbsoluteSize.X;
+                        local SliderPos = SliderBar.AbsolutePosition.X;
+
+                        local Pos = (MousePos-SliderPos) / SliderSize;
+                        local Percentage = math.clamp(Pos, 0, 1);
+
+                        SliderBox.Position = UDim2.new(Percentage, -(SliderBox.Size.X.Offset*0.5), ButtonPos.Y.Scale, ButtonPos.Y.Offset);
+
+                        local Value = math.round(math.floor((Min + (Max - Min) * Percentage) * Max) / Max);
+
+                        Callback(Value);
+                    end;
+                end);
+
+                MouseKill = UserInputService.InputEnded:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        MouseMove:Disconnect();
+                        MouseKill:Disconnect();
+                    end;
+                end);
+            end);
+        else
+            error("Value must be between min and max");
+        end;
+    end;
+
     WindowMinimize.MouseButton1Click:Connect(function()
         if not W.Minimized then
             for _, Child in next, WindowContentHolder:GetChildren() do
